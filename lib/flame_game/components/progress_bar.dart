@@ -1,12 +1,19 @@
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:kick/flame_game/manager/level_manager.dart';
 
 class ProgressBarIndicator extends Component {
+  final Vector2 size;
+  final Function() callBackTimeOver;
+  final LevelManager levelManager;
+
+  ProgressBarIndicator(this.callBackTimeOver, this.size, this.levelManager,
+      {this.value = 1});
+
   double maxValue = 1;
   double minValue = 0;
   double value;
-  Vector2 size;
 
   double _time = 0;
 
@@ -14,10 +21,6 @@ class ProgressBarIndicator extends Component {
   Paint paintValue = Paint();
   Rect? bgRect;
   Rect? valueRect;
-
-  Function() callBackTimeOver;
-
-  ProgressBarIndicator(this.callBackTimeOver, this.size, {this.value = 1});
 
   late double dx;
   late double dy;
@@ -56,17 +59,21 @@ class ProgressBarIndicator extends Component {
     }
     if (_time > 1) {
       _time = 0;
-      value -= 0.003;
+      value -= levelManager.timeReduction;
       valueRect = Rect.fromLTWH(dx, dy, sizeLine * value, sizeH);
     }
     _time++;
   }
 
   addTime() {
-    value += 0.01;
+    if (value + levelManager.addingTime > 1) {
+      value = 1;
+    } else {
+      value += levelManager.addingTime;
+    }
   }
 
   loseTime() {
-    value -= 0.01;
+    value -= levelManager.addingTime;
   }
 }

@@ -1,17 +1,17 @@
 import 'package:flame/components.dart';
-import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flame/parallax.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kick/cubit/game_cubit/game_cubit.dart';
 import 'package:kick/cubit/user_cubit/user_cubit.dart';
 import 'package:kick/data/models/user.dart';
-import 'package:kick/flame_game/components/fiel_manager.dart';
-import 'package:kick/flame_game/components/image_manager.dart';
+import 'package:kick/flame_game/components/level_panel.dart';
 import 'package:kick/flame_game/components/progress_bar.dart';
 import 'package:kick/flame_game/components/score_panel.dart';
+import 'package:kick/flame_game/manager/fiel_manager.dart';
+import 'package:kick/flame_game/manager/image_manager.dart';
+import 'package:kick/flame_game/manager/level_manager.dart';
 import 'package:kick/flame_game/overlays/game_over_menu.dart';
 import 'package:kick/flame_game/overlays/pause_button.dart';
 import 'package:kick/flame_game/overlays/pause_menu.dart';
@@ -21,22 +21,24 @@ class SFgame extends FlameGame with HasTappables {
   FielManager? fielManager;
   late ProgressBarIndicator progressBarIndicator;
   late ScorePanel scorePanel;
+  late LevelPanel levelPanel;
   late ImageManager imageManager;
-  bool isRunning = true;
+  late LevelManager levelManager;
 
   SFgame(this.context);
 
   @override
   Future<void>? onLoad() async {
-    Flame.device.fullScreen();
-
     imageManager = ImageManager(this);
     await imageManager.init();
 
     fielManager = FielManager(this, imageManager, hitTheTarget);
 
-    progressBarIndicator = ProgressBarIndicator(timeOver, size);
     scorePanel = ScorePanel(size);
+    levelPanel = LevelPanel(size);
+    levelManager = LevelManager(scorePanel, levelPanel, changeLevel);
+
+    progressBarIndicator = ProgressBarIndicator(timeOver, size, levelManager);
 
     ParallaxImage(imageManager.getItem("background"));
 
@@ -50,19 +52,18 @@ class SFgame extends FlameGame with HasTappables {
     add(_back);
     addAll(fielManager!.listFiel);
     add(scorePanel);
+    add(levelPanel);
     add(progressBarIndicator);
 
     return super.onLoad();
   }
 
   void timeOver() {
-    isRunning = false;
     saveData();
 
     this.pauseEngine();
     this.overlays.remove(PauseButton.ID);
     this.overlays.add(GameOverMenu.ID);
-
   }
 
   saveData() {
@@ -76,19 +77,18 @@ class SFgame extends FlameGame with HasTappables {
   }
 
   void restart() {
-    isRunning = true;
     scorePanel.reset();
+    levelPanel.reset();
     progressBarIndicator.value = 1;
+    changeLevel(1);
   }
 
   void hitTheTarget(bool check) {
-    if (!isRunning) return;
-
     if (check) {
-      scorePanel.setPoint(1);
+      scorePanel.addPoint(levelManager.addingPoints);
       progressBarIndicator.addTime();
     } else {
-      scorePanel.setPoint(-1);
+      scorePanel.addPoint(-levelManager.addingPoints);
       progressBarIndicator.loseTime();
     }
   }
@@ -112,10 +112,16 @@ class SFgame extends FlameGame with HasTappables {
     super.lifecycleStateChange(state);
   }
 
+  void changeLevel(int level) {
+    removeAll(fielManager!.listFiel);
+    fielManager!.resize(level + 2);
+    addAll(fielManager!.listFiel);
+  }
+
   @override
   void update(double dt) {
     super.update(dt);
-    if (!isRunning) return;
     fielManager!.update(dt);
+    levelManager.update();
   }
 }

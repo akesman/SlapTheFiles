@@ -1,4 +1,6 @@
+import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kick/cubit/game_cubit/game_cubit.dart';
 import 'package:kick/cubit/user_cubit/user_cubit.dart';
@@ -9,10 +11,15 @@ import 'package:kick/pages/game_page.dart';
 import 'package:kick/pages/start_page.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+Future<void> main() async {
   DatabaseApi _databaseApi = DatabaseApi();
 
   UserService userService = UserService(UserApi(_databaseApi));
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // This opens the app in fullscreen mode.
+  await Flame.device.fullScreen();
 
   runApp(
     MultiProvider(
@@ -36,6 +43,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.green,

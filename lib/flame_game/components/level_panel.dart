@@ -2,15 +2,15 @@ import 'package:flame/components.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class ScorePanel extends TextComponent {
-  late int points = 0;
+class LevelPanel extends TextComponent {
+  late int level = 1;
   Vector2 gameSize;
 
-  ScorePanel(this.gameSize) {
-    text = 'Очки : $points';
+  LevelPanel(this.gameSize) {
+    text = 'Уровень : $level';
     size = Vector2(gameSize.x * 0.8, gameSize.y * 0.05);
     x = gameSize.x * 0.1;
-    y = gameSize.y * 0.16;
+    y = gameSize.y * 0.16 + gameSize.y * 0.05;
     anchor = Anchor.topLeft;
 
     textRenderer = TextPaint(
@@ -18,14 +18,14 @@ class ScorePanel extends TextComponent {
     );
   }
 
-  addPoint(int point) {
-    if (point < 0 && points <= 0) return;
-    this.points += point;
-    text = 'Очки : $points';
+  setLevel(int level) {
+    if (level < 0 && level <= 0) return;
+    this.level = level;
+    text = 'Уровень : $level';
   }
 
   reset() {
-    points = 0;
-    text = 'Очки : $points';
+    level = 1;
+    text = 'Уровень : $level';
   }
 }
