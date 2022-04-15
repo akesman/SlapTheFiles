@@ -16,14 +16,14 @@ class UserApi {
     return selectData.data;
   }
 
-  Future<bool> addUser(Map<String, dynamic> json) async {
+  Future<List<dynamic>?> addUser(Map<String, dynamic> json) async {
     final insertData = (await databaseApi
         .getSupabaseClient()
         .from("userG")
-        .insert(json)
+        .upsert(json)
         .execute());
 
-    if (insertData.error == null) return true;
-    return false;
+    if (insertData.error != null) return null;
+    return insertData.data;
   }
 }

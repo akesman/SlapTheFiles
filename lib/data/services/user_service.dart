@@ -9,16 +9,16 @@ class UserService {
 
   UserService(this.userApi);
 
-  Future<void> addUser(User user) async {
+  Future<User?> addUser(User user) async {
     log.d("Event: addUser");
-    if (user == null) return;
+    if (user == null) return null;
     final json = User.userToJson(user);
+    final data = await userApi.addUser(json);
 
-    if (await userApi.addUser(json)) {
-      log.d("Event: addUser well done");
-    } else {
-      log.d("Event: addUser ERROR!");
+    if (data != null && data.length > 0) {
+      return User.jsonToUser(data?.first);
     }
+    return null;
   }
 
   Future<List<User>> getUsers() async {

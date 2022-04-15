@@ -11,6 +11,7 @@ part 'user_state.dart';
 class UserCubit extends Cubit<UserState> {
   late UserService _userService;
 
+  User? _currentUser = User();
   List<User> userList = [];
 
   UserCubit(BuildContext context) : super(UserInitialState()) {
@@ -18,15 +19,23 @@ class UserCubit extends Cubit<UserState> {
   }
 
   Future<void> reloadUsers() async {
-    emit(UserLoadingState());
     clear();
     userList = await _userService.getUsers();
+    emit(UserLoadingState());
     emit(UserLoadState(userList));
   }
 
   Future<void> addUser(User user) async {
-    await _userService.addUser(user);
+    _currentUser = await _userService.addUser(user);
     await reloadUsers();
+  }
+
+
+  User? get currentUser => _currentUser;
+
+
+  set setCurrentUser(User? value) {
+    _currentUser = value;
   }
 
   void clear() {
