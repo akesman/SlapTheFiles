@@ -66,6 +66,7 @@ class MyApp extends StatelessWidget {
           } else if (state is GameScreenState) {
             return const GamePage();
           } else if (state is StartScreenState) {
+            BlocProvider.of<UserCubit>(context).reloadUsers();
             return const StartPage();
           }
           return Container();

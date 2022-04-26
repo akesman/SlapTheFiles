@@ -19,7 +19,6 @@ class UserCubit extends Cubit<UserState> {
   }
 
   Future<void> reloadUsers() async {
-    clear();
     userList = await _userService.getUsers();
     emit(UserLoadingState());
     emit(UserLoadState(userList));
@@ -30,15 +29,9 @@ class UserCubit extends Cubit<UserState> {
     await reloadUsers();
   }
 
-
   User? get currentUser => _currentUser;
-
 
   set setCurrentUser(User? value) {
     _currentUser = value;
-  }
-
-  void clear() {
-    userList.clear();
   }
 }

@@ -35,7 +35,7 @@ class _StartPageState extends State<StartPage> {
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage("assets/images/backgroundStart.jpg"),
-            fit: BoxFit.cover,
+            fit: BoxFit.fill,
           ),
         ),
         child: RefreshIndicator(
@@ -69,7 +69,6 @@ class _StartPageState extends State<StartPage> {
                       child: BlocBuilder<UserCubit, UserState>(
                         builder: (context, state) {
                           if (state is UserInitialState) {
-                            BlocProvider.of<UserCubit>(context).reloadUsers();
                           } else if (state is UserLoadState) {
                             return _buildList(state.userList);
                           }
@@ -78,11 +77,11 @@ class _StartPageState extends State<StartPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 4),
+                  SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.only(left: 8),
                     decoration: const BoxDecoration(
-                      color: Colors.black26,
+                      color: Colors.black38,
                       borderRadius: BorderRadius.all(
                         Radius.circular(4),
                       ),
@@ -139,15 +138,22 @@ class _StartPageState extends State<StartPage> {
             return Column(
               children: [
                 ListTile(
-                  title: Text(list[index].point.toString()),
-                  leading: Text(list[index].name!),
+                  title: Text(
+                    "${list[index].name!} ${list[index].point.toString()}",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  leading: Text(
+                    "${index + 1}",
+                    style: TextStyle(fontSize: 24, color: Colors.white70),
+                    textAlign: TextAlign.center,
+                  ),
                   subtitle: Text(
                     Tools.getLocalString(
                       list[index].created_at!.toLocal(),
                     ),
                   ),
                 ),
-                const Divider(height: 2,endIndent: 10, indent: 10),
+                const Divider(height: 2, endIndent: 10, indent: 10),
               ],
             );
           },
